@@ -1,0 +1,389 @@
+% (c) 2002 Matthew Boedicker <mboedick@mboedick.org> (original author) http://mboedick.org
+% (c) 2003-2007 David J. Grant <davidgrant-at-gmail.com> http://www.davidgrant.ca
+% (c) 2008 Nathaniel Johnston <nathaniel@nathanieljohnston.com> http://www.nathanieljohnston.com
+%
+% (c) 2012 Scott Clark <sc932@cornell.edu> cam.cornell.edu/~sc932
+%
+%This work is licensed under the Creative Commons Attribution-Noncommercial-Share Alike 2.5 License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/2.5/ or send a letter to Creative Commons, 543 Howard Street, 5th Floor, San Francisco, California, 94105, USA.
+
+\documentclass[letterpaper,11pt]{article}
+\newlength{\outerbordwidth}
+\pagestyle{empty}
+\raggedbottom
+\raggedright
+\usepackage[svgnames]{xcolor}
+\usepackage{framed}
+\usepackage{tocloft}
+
+% we use utf8 since we want to build from any machine
+\usepackage[utf8]{inputenc}		
+
+%----------------------------------------------------------------------------------------
+%	LOGIC
+%----------------------------------------------------------------------------------------
+
+% provides \isempty test
+\usepackage{xstring, xifthen}
+
+%----------------------------------------------------------------------------------------
+%	FONT BASICS
+%----------------------------------------------------------------------------------------
+
+% some tex-live fonts - choose your own
+
+%\usepackage[defaultsans]{droidsans}
+%\usepackage[default]{comfortaa}
+%\usepackage{cmbright}
+\usepackage[default]{raleway}
+%\usepackage{fetamont}
+%\usepackage[default]{gillius}
+%\usepackage[light,math]{iwona}
+%\usepackage[thin]{roboto} 
+
+% set font default
+\renewcommand*\familydefault{\sfdefault} 	
+\usepackage[T1]{fontenc}
+
+% more font size definitions
+\usepackage{moresize}
+%----------------------------------------------------------------------------------------
+%	FONT AWESOME ICONS
+%---------------------------------------------------------------------------------------- 
+
+% include the fontawesome icon set
+\usepackage{fontawesome}
+
+% use to vertically center content
+% credits to: http://tex.stackexchange.com/questions/7219/how-to-vertically-center-two-images-next-to-each-other
+\newcommand{\vcenteredinclude}[1]{\begingroup
+\setbox0=\hbox{\includegraphics{#1}}%
+\parbox{\wd0}{\box0}\endgroup}
+
+% use to vertically center content
+% credits to: http://tex.stackexchange.com/questions/7219/how-to-vertically-center-two-images-next-to-each-other
+\newcommand*{\vcenteredhbox}[1]{\begingroup
+\setbox0=\hbox{#1}\parbox{\wd0}{\box0}\endgroup}
+
+% icon shortcut
+\newcommand{\icon}[3] { 							
+	\makebox(#2, #2){\textcolor{maincol}{\csname fa#1\endcsname}}
+}	
+
+% icon with text shortcut
+\newcommand{\icontext}[4]{ 						
+	\vcenteredhbox{\icon{#1}{#2}{#3}}  \hspace{2pt}  \parbox{0.9\mpwidth}{\textcolor{#4}{#3}}
+}
+
+% icon with website url
+\newcommand{\iconhref}[5]{ 						
+    \vcenteredhbox{\icon{#1}{#2}{#5}}  \hspace{2pt} \href{#4}{\textcolor{#5}{#3}}
+}
+
+% icon with email link
+\newcommand{\iconemail}[5]{ 						
+    \vcenteredhbox{\icon{#1}{#2}{#5}}  \hspace{2pt} \href{mailto:#4}{\textcolor{#5}{#3}}
+}
+
+%-----------------------------------------------------------
+%Edit these values as you see fit
+
+\setlength{\outerbordwidth}{3pt}  % Width of border outside of title bars
+\definecolor{shadecolor}{gray}{0.75}  % Outer background color of title bars (0 = black, 1 = white)
+\definecolor{shadecolorB}{gray}{0.93}  % Inner background color of title bars
+
+\newcommand{\mpwidth}{\linewidth-\fboxsep-\fboxsep}
+%-----------------------------------------------------------
+%Margin setup
+
+\setlength{\evensidemargin}{-0.25in}
+\setlength{\headheight}{0in}
+\setlength{\headsep}{0in}
+\setlength{\oddsidemargin}{-0.25in}
+\setlength{\paperheight}{11in}
+\setlength{\paperwidth}{8.5in}
+\setlength{\tabcolsep}{0in}
+\setlength{\textheight}{9.5in}
+\setlength{\textwidth}{7in}
+\setlength{\topmargin}{-0.3in}
+\setlength{\topskip}{0in}
+\setlength{\voffset}{0.1in}
+%----------------------------------------------------------------------------------------
+%	TABLE /ARRAY DEFINITIONS
+%---------------------------------------------------------------------------------------- 
+
+% extended aligning of tabular cells
+\usepackage{array}
+
+% custom column right-align with fixed width
+% use like p{size} but via x{size}
+\newcolumntype{x}[1]{%
+>{\raggedleft\hspace{0pt}}p{#1}}%
+
+
+%----------------------------------------------------------------------------------------
+%	GRAPHICS DEFINITIONS
+%---------------------------------------------------------------------------------------- 
+
+%for header image
+\usepackage{graphicx}
+
+% use this for floating figures
+% \usepackage{wrapfig}
+% \usepackage{float}
+% \floatstyle{boxed} 
+% \restylefloat{figure}
+
+%for drawing graphics		
+\usepackage{tikz}				
+\usetikzlibrary{shapes, backgrounds,mindmap, trees}
+
+%----------------------------------------------------------------------------------------
+%	Color DEFINITIONS
+%---------------------------------------------------------------------------------------- 
+\usepackage{transparent}
+\usepackage{color}
+%----------------------------------------------------------------------------------------
+%	PAGE LAYOUT  DEFINITIONS
+%----------------------------------------------------------------------------------------
+
+% page outer frames (debug-only)
+% \usepackage{showframe}		
+
+% we use paracol to display breakable two columns
+\usepackage{paracol}
+
+% define page styles using geometry
+\usepackage[a4paper]{geometry}
+% primary color
+\definecolor{maincol}{RGB}{ 225, 0, 0 }
+
+% accent color, secondary
+% \definecolor{accentcol}{RGB}{ 250, 150, 10 }
+
+% dark color
+\definecolor{darkcol}{RGB}{ 70, 70, 70 }
+
+% light color
+\definecolor{lightcol}{RGB}{245,245,245}
+
+
+% Renders a a CV section headline with a nice underline in main color.
+% param 1: section title
+\newcommand{\cvsection}[1] {
+	\vspace{14pt}
+	%\cvtext{
+		\textbf{\LARGE{\textcolor{darkcol}{\uppercase{#1}}}}\\[-4pt]
+		\textcolor{maincol}{ \rule{0.1\textwidth}{2pt} } \\
+	%}
+}
+%-----------------------------------------------------------
+%Custom commands
+
+\newcommand{\cvevent}[7] {
+	
+	% we wrap this part in a parbox, so title and description are not separated on a pagebreak
+	% if you need more control on page breaks, remove the parbox
+	\parbox{\mpwidth}{
+		\begin{tabular*}{1\mpwidth}{p{0.72\mpwidth}  r}
+	 		\textcolor{black}{\textbf{#2}} & \colorbox{maincol}{\makebox[0.25\mpwidth]{\textcolor{white}{#1}}} \\
+			\textcolor{maincol}{\textbf{#3}} & \\
+		\end{tabular*}\\[4pt]
+	
+		\ifthenelse{\isempty{#4}}{}{
+			\cvtext{#4}\\
+		}
+	}
+
+	\ifthenelse{\isempty{#5}}{}{
+		\vspace{4pt}
+		{#5}
+	}
+	\vspace{4pt}
+}
+\newcommand{\cvlist}[1] {
+    \textbf{Roles and Responsibilities:}
+	\begin{itemize}{#1}\end{itemize}
+}
+
+\newcommand{\resitem}[1]{\item #1 \vspace{-2pt}}
+\newcommand{\resheading}[1]{\vspace{8pt}
+  \parbox{\textwidth}{\setlength{\FrameSep}{\outerbordwidth}
+    \begin{shaded}
+\setlength{\fboxsep}{0pt}\framebox[\textwidth][l]{\setlength{\fboxsep}{4pt}\fcolorbox{shadecolorB}{shadecolorB}{\textbf{\sffamily{\mbox{~}\makebox[6.762in][l]{\large #1} \vphantom{p\^{E}}}}}}
+    \end{shaded}
+  }\vspace{-5pt}
+}
+\newcommand{\ressubheading}[4]
+
+{
+%-----------------------------------------------------------
+\begin{document}
+
+\begin{tabular*}{7in}{l@{\extracolsep{\fill}}r}
+ &
+\textbf{\emph{Name}}: Dhadage Ramnath Balasaheb\\
+ &\textbf{\emph{Mobile No}}: (+91)7620917166\\
+ &\textbf{\emph{Email Id}}: \textcolor{blue}{ram.dhadage123@gmail.com}\\
+ &\textbf{\emph{LinkedIn}}:{blue} {https://www.linkedin.com/in/ramnath-dhadage/}\\
+\end{tabular*}
+\resheading{\LARGE{\underline{Objective}}}
+Aspire for a challenging position in a professional Organization where I can enhance my skills and strengthen them in conjunction with the Organizations goals.
+
+\resheading{\LARGE{\underline{Experience Summary}}}
+\cvevent
+	{17 Apr 2023 - NOW}
+	{Sr. Shiny Developer}
+	{Ephicacy Lifescience Analytics Private Limited}
+	{Currently employing  as a \textbf{Sr. Shiny Developer} and \textbf{Sr.Statistical Programmer} in an Agile team in the Ephicacy Lifescience Analytics Private Limited from \textbf{11 Aug 2021}.  Skilled in \textbf{Web Development} as well as in \textbf{Clinical research}. Have good hands-on experience on \textbf{R and R shiny }, \textbf{HTML,CSS, JavaScript, Bootstrap}, \textbf{Python} and \textbf{Git and Github}.}
+	{\cvlist{
+            \item Guided and taught team members to enhance their expertise and commitment.
+            \item Provided assistance in breaking down tasks, assigning them to teammates, and ensuring their completion.
+            \item Conducted regular reviews of team's work, merged it to the master branch, and deployed it using R Studio Connect.
+            \item Embraced the Teal framework and incorporated associated packages and successfully implemented existing open-source Teal modules into shiny applications.
+            \item Developed custom Teal (Shiny) modules to improve interactivity in applications, allowing users to manipulate plots and tables based on various parameters and make cosmetic adjustments.
+            \item Utilized R6 (Object-Oriented Programming) and Rlang (Meta-programming) to ensure efficient code architecture and extensibility.
+            \item Employed profiling tools, shiny-load tests, and bench to measure performance and optimize application performance using advanced techniques like caching and vectorization. 
+            \item Leveraged the ggplot2 R package to build complex visualizations and created a custom R package to streamline sharing and editing of visualizations. Utilized ggiraph and Plotly for interactive visualization.
+            \item Employed the checkmate R package to rigorously test all arguments to Teal modules.Implemented Shinytest2 for comprehensive end-to-end app testing.Utilized testthat for unit testing. 
+	    }}
+\vfill\null
+\cvevent
+	{11 Aug 2021 - 31 Dec 2023}
+	{Shiny Developer}
+	{Tata Consultancy Services}
+	{Currently employing  as a \textbf{Shiny Developer} and \textbf{Software Engineer} in an Agile team in the Tata Consultancy Services from \textbf{11 Aug 2021}.  Skilled in Web Development as well as in Data Science. Have good hands-on experience on \textbf{R and R shiny }, \textbf{HTML,
+	CSS, JavaScript, Bootstrap},\textbf{Python} and \textbf{Git and Github}.}
+	{\cvlist{
+	    \item Analyzing clinical trial data Statistically in order to detect crucial and potential frauds. Building R shiny applications to simplify user analysis and generate downloadable, ready-to-interpret reports from them.
+	    \item Producing innovative R/R Shiny applications using  R CSS/SASS, JavaScript, and Bootstrap.
+	    \item Utilizing the cashing mechanism to enhance the speed, memory usage, and scalability of shiny apps.
+	    \item Utilizing Rstudio Connect to deploy the applications.
+	    \item Read, comprehend, and assess R/R Shiny code files for unit testing. Create a unit testing approach for each unit that will be tested. Utilize tools such as testthat, shinytest2, and others to create unit tests. Examine test outcomes for any potential bugs.
+	    \item Contributing to the development of open - sourced R packages and R markdown Reports.}}
+\vfill\null
+\cvevent
+    {Jun 2017 - Aug 2021}
+	{Data Scientist and Software Engineer}
+	{Cytel Statistical Software and Services}
+    {From \textbf{June 2017 to August 2021}, I worked as a \textbf{Data Scientist and Software Engineer} in an \textbf{Agile} team at Cytel. Expert in \textbf{web development and data science}. Have practical experience with \textbf{Machine Learning, Natural Language Processing, Python, and R/R Shiny}.}
+    {\cvlist{
+        \item Mine and analyze data from company databases to drive optimization and improvement of product development, marketing techniques and business strategies.
+        \item Create course material for data science training.
+        \item Study statistical research paper and other publication. 
+        \item Design and document sufficiently detailed algorithm specifications for complex statistical/mathematical methods that Software Engineers can implement and test.
+        \item Create POCs using R shiny, JavaScript, Bootstrap, jQuery, HTML and CSS for internal stakeholder and to help developers and testers understand these algorithms well.
+        \item Write code in R/Python to explore computational properties of algorithms (like statistical and numerical accuracy). Guide statistician testers in the team to do the same.
+        \item Study R packages and Python libraries that could be used to perform comparative testing of Cytel’s engines.
+        \item Experience in standard procedure like Agile, Waterfall etc.
+        \item Experience in  source control and versioning tool like git, git extension, bit bucket, TFS etc
+        \item Experience in project management tool like Jira, Confluence, Trello.}
+}
+\vfill\null
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\resheading{\LARGE{\underline{Workshop/Conference Participation}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{itemize}
+    \item Perceived \textbf{master degree in 'Artificial Intelligence Engineering'}(\url{https://intelliPaat.com/artificial-intelligence-masters-training-course/}) with IBM and IntelliPaat.
+    \item Attended \textbf{2020 Joint Statistical Meetings (JSM) Virtual Conference}.
+    \item  Attended 5 days training on \textbf{Basic Web Developments} (HTML,  CSS,Bootstrap, JavaScript , jQuery,XML and  JSON).
+    \item Attended \textbf{Python Language Training} held at Hyderabad (March 2018). 
+    \item Completed \textbf{Clinical Trial Domain Overview} course conducted by Cliplab (Clinical Programming Laboratory, Cytel)  
+    \item Presented a research paper entitled  \textbf{Variable Selection and Modeling: Application to Type 1a Supernovae Data} in Indian Society for Probability and Statistics,held at Aligarh Muslim University, Aligarh, India.(December 2016)
+    \item  Volunteered the \textbf{ International Workshop on Reliability Theory and Survival analysis}, held at Savitribai Phule Pune University.(November 2016)
+    \item Volunteered the \textbf{ International Conference on Celebrating Statistical  Innovation and Impact in a World of Big and Small Data}, held at Savitribai Phule Pune University.(December 2015)\\
+\end{itemize}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+\resheading{\LARGE{\underline{Computer Skills}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{itemize}
+   \item Proficient in \textbf{R, Python,  JavaScript,   jQuery,    Latex, HTML,CSS, Bootstrap} Software
+   \item Basic knowledge of  \textbf{
+   C++, {C\#}, SQL, Minitab,    SAS, Visual Studio {\&} Visual Studio Code }
+   \item Completed  \textbf{ Computer Application} course in 2013
+    \item Completed \textbf{MSCIT} course in 2008 \\
+\end{itemize}
+    
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\resheading{\LARGE{\underline{Technical Skill}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{itemize}
+    \item Machine Learning (ML)
+    \item Deep learning (DL)
+    \item Natural Language Processing (NLP)
+    \item Artificial Intelligence (AL)
+    \item Object-Oriented Programming (OOPs)
+    \item Agile Methodology
+    \item Web Development
+\end{itemize}    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\resheading{\LARGE{\underline{Projects}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+     \begin{itemize}
+          \begin{center}
+                \item \textbf{1. Data Science Approach to Determine Distances Beyond Our Vision} 
+       \end{center}    
+     \item      \large{\textbf{Tool used}}: R programming, Latex.\\
+        \item   \large{\textbf{Objective}}: Use data science approach to determine distances beyond our vision\\
+       \begin{center}
+          \textbf{2. Time Series analysis of 10 Different Data sets} 
+       \end{center}    
+      \item      \large{\textbf{Tool used}}: R programming, Latex.\\
+      \item      \large{\textbf{Objective}}: Apply various Time Series technique such as Moving Averages, Exponential Smoothing, ARMA/ARIMA, ARCH/GARCH etc.   \\
+         \begin{center}
+          \textbf{3. Multivariate Techniques to Select Important Component from Hipparcos star dataset} 
+       \end{center}    
+         \item  \large{\textbf{Tool used}}: R programming, Latex.\\
+    \item   \large{\textbf{Objective}}: Use Multivariate Techniques to classify and extract Important Component from Hipparcos star dataset.    \\ 
+\end{itemize}
+ \resheading{\LARGE{\underline{Educational Details}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{tabular}{|c|c|c|c|}
+\hline
+Qualification&University/Board &Percentage/CGPA &Month and Year of Passing\\
+\hline
+S.S.C. & Maharashtra State Board&83.38& March-2009 \\
+\hline
+H.S.C. & Maharashtra State Board&52.67&February-2011\\
+\hline
+Bachelor of  Science (Statistics)&Savitribai Phule Pune University&81.26&April-2014\\
+\hline
+Master of  Science (Statistics)&Savitribai Phule Pune University&3.08/6& December 2016\\
+\hline
+\end{tabular}
+
+\resheading{\LARGE{\underline{Hobbies }}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \begin{itemize}
+    \item  Writing Urdu/Marathi Poetry.
+    \item  Playing Chess and Cricket
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\resheading{\LARGE{\underline{Personal Details}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+    \textbf{\emph{Name}}: Dhadage Ramnath Balasaheb\\
+    \textbf{\emph{At/post}}: Chanda,
+    \textbf{\emph{Tal}}: Newasa,
+    \textbf{\emph{Dist}}: Ahmednagar\\
+    \textbf{\emph{Gender}}: Male\\
+    \textbf{\emph{Date of Birth }}: December 7, 1992\\
+    \textbf{\emph{Nationality}}: Indian\\
+    \textbf{\emph{Language Known}}: Marathi, Hindi and English\\
+    \textbf{\emph{Mobile No}}: (+91)7620917166\\
+    \textbf{\emph{Email Id}}: \textcolor{blue}{ram.dhadage123@gmail.com}\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\resheading{\LARGE{\underline{Declaration }}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+I hereby declare that the above mentioned information is correct up to my knowledge and I bear the responsibility of correctness of above mentioned particulars.\\
+Date:\\
+
+
+\hfill{Dhadage Ramnath Balasaheb}
+\\
+Place  
+\hfill
+\end{document}
+
+
+
